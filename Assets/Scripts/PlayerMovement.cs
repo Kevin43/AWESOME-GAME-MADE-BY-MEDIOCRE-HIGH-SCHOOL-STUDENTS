@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour {
 
@@ -17,10 +18,13 @@ public class PlayerMovement : MonoBehaviour {
     public bool grounded = false;
     public LayerMask whatIsGround;
     private Animator anim;
+    public int health;
+    private int ENEMY_LAYER = 12;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 
+        health = 3;
         playerSpeed = 3f;
         anim = GetComponent<Animator>();
         anim.SetBool("Spawning", false);
@@ -65,6 +69,11 @@ public class PlayerMovement : MonoBehaviour {
     void Update ()
     {
 
+        if(health <= 0)
+        {
+            SceneManager.LoadScene("h");
+        }
+
         if (!stunned)
             checkInputs();
 
@@ -81,6 +90,20 @@ public class PlayerMovement : MonoBehaviour {
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.gameObject.layer == ENEMY_LAYER)
+        {
+            Damage();
+        }
+    }
+    void Damage()
+    {
+        anim.SetTrigger("Damaged");     //sets the damage animation
+        health--;
+        print("Damaged, health is now" + health);
     }
 
     private void checkInputs()
